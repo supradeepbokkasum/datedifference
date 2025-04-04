@@ -80,7 +80,9 @@
   </style>
 </head>
 <body>
+  <div id="content">
   <main>
+
     <h1>Date & Time Difference Calculator</h1>
 
     <label for="start">Start Date:</label>
@@ -96,8 +98,38 @@
     <output id="result"></output>
     <p class="note">Tip: You can also type directly into the date & time fields</p>
   </main>
+  </div>
 
+  <div id="blocked" style="display:none;">
+    ❌ Unauthorized access</strong>.
+  </div>
   <script>
+  const allowedHost = "datediff.cosmicchutney.space";
+
+  function allowRender() {
+    // Not in an iframe
+    if (window.top === window.self) return false;
+
+    // Check if referrer is from the correct domain
+    try {
+      const ref = new URL(document.referrer);
+      return ref.hostname === allowedHost;
+    } catch (e) {
+      return false; // Invalid referrer
+    }
+  }
+
+  const content = document.getElementById("content");
+  const blocked = document.getElementById("blocked");
+
+  if (allowRender()) {
+    content.style.display = "block";
+  } else {
+    blocked.style.display = "block";
+    content.style.display = "none";
+    console.warn("Blocked access: must be embedded from", allowedHost);
+  }
+
     const calculateButton = document.getElementById("calculate");
 
     function getDayName(date) {
