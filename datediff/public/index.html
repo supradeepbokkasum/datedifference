@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Date & Time Difference Tool</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #f9fafb;
+      color: #333;
+    }
+
+    main {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      color: #1e293b;
+    }
+
+    label {
+      font-weight: 600;
+      margin-top: 15px;
+      display: block;
+    }
+
+    input[type="date"],
+    input[type="time"] {
+      padding: 10px;
+      font-size: 1rem;
+      margin-top: 5px;
+      margin-bottom: 20px;
+      width: 100%;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: white;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #0f172a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      display: block;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #1e293b;
+    }
+
+    output {
+      display: block;
+      margin-top: 20px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      text-align: center;
+      color: #0f172a;
+    }
+
+    .note {
+      font-size: 0.9rem;
+      color: #64748b;
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Date & Time Difference Calculator</h1>
+
+    <label for="start">Start Date:</label>
+    <input type="date" id="start" placeholder="YYYY-MM-DD" />
+    <input type="time" id="startTime" />
+
+    <label for="end">End Date:</label>
+    <input type="date" id="end" placeholder="YYYY-MM-DD" />
+    <input type="time" id="endTime" />
+
+    <button id="calculate">Calculate Difference</button>
+
+    <output id="result"></output>
+    <p class="note">Tip: You can also type directly into the date & time fields</p>
+  </main>
+
+  <script>
+    const calculateButton = document.getElementById("calculate");
+
+    function getDayName(date) {
+      return date.toLocaleDateString('en-US', { weekday: 'long' });
+    }
+
+    function countLeapYears(start, end) {
+      let count = 0;
+      for (let y = start.getFullYear(); y <= end.getFullYear(); y++) {
+        if ((y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0)) {
+          count++;
+        }
+      }
+      return count;
+    }
+
+    calculateButton.addEventListener("click", () => {
+      const startDateVal = document.getElementById("start").value;
+      const endDateVal = document.getElementById("end").value;
+      const startTimeVal = document.getElementById("startTime").value || "00:00";
+      const endTimeVal = document.getElementById("endTime").value || "00:00";
+      const result = document.getElementById("result");
+
+      if (!startDateVal || !endDateVal) {
+        result.textContent = "Please select both dates.";
+        return;
+      }
+
+      const start = new Date(`${startDateVal}T${startTimeVal}`);
+      const end = new Date(`${endDateVal}T${endTimeVal}`);
+
+      if (isNaN(start) || isNaN(end)) {
+        result.textContent = "Invalid date/time input.";
+        return;
+      }
+
+      const diffMs = Math.abs(end - start);
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+      let years = end.getFullYear() - start.getFullYear();
+      let months = end.getMonth() - start.getMonth();
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+
+      const startDay = getDayName(start);
+      const endDay = getDayName(end);
+      const leapCount = countLeapYears(start, end);
+
+      result.innerHTML = `
+        <div>🧮 Total Difference: <strong>${diffDays} days</strong>, <strong>${diffHours} hours</strong>, <strong>${diffMinutes} minutes</strong></div>
+        <div>📆 Calendar Diff: <strong>${years} years, ${months} months</strong></div>
+        <div>📅 Start Date: <strong>${startDay}</strong></div>
+        <div>📅 End Date: <strong>${endDay}</strong></div>
+        <div>🔁 Leap Years in Range: <strong>${leapCount}</strong></div>
+      `;
+    });
+  </script>
+</body>
+</html>
